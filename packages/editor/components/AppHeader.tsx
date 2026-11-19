@@ -18,6 +18,7 @@ import type { CompactPlanAction } from '@plannotator/ui/components/PlanHeaderMen
 import { HtmlSurfaceControls } from '@plannotator/ui/components/HtmlSurfaceControls';
 import { Tooltip } from '@plannotator/ui/components/Tooltip';
 import { BundleSwitcher, type BundleSwitcherProps } from './BundleSwitcher';
+import { LocaleThemeToggles } from '@plannotator/ui/components/LocaleThemeToggles';
 
 /** Plannotator's refresh strings for the published control: the document
  * is a file on disk, so the refresh says so. */
@@ -512,6 +513,9 @@ export const AppHeader = React.memo<AppHeaderProps>(({
             showDocumentFont={documentTextSizeAvailable}
           />
         </div>
+
+        {/* Language (AR/EN) and dark/light switches */}
+        <LocaleThemeToggles compact={compactTouchLayout} />
 
         <PlanHeaderMenu
           appVersion={appVersion}

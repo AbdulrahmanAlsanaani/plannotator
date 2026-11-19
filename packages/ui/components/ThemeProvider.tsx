@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { ensureI18n } from '../i18n/domTranslator';
 import { configStore } from '../config/configStore';
 import { readThemePairCookies, writeThemePairCookies } from '../config/settings';
 import { useConfigValue } from '../config/useConfig';
@@ -249,6 +250,8 @@ export function ThemeProvider({
     requestAnimationFrame(() => {
       document.documentElement.classList.add('transitions-ready');
     });
+    // Arabic / English interface (RTL + translated chrome).
+    ensureI18n();
   }, []);
 
   // [P2 fix] Listen for system theme changes AND re-read current value when

@@ -1909,3 +1909,48 @@ body:has([data-popout="true"]) [data-sidebar-tabs="true"] {
     animation: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Arabic / right-to-left support
+ *
+ * <html dir="rtl"> is set when the interface language is Arabic (see
+ * packages/ui/i18n). The flex layout mirrors on its own; the rules below
+ * keep code, diffs and terminals left-to-right, give Arabic text a font
+ * that has the glyphs, and let every paragraph of a reviewed document
+ * align by its own language (so a mixed Arabic/English plan reads well
+ * in either interface language).
+ * ───────────────────────────────────────────────────────────────────── */
+html[lang="ar"] body {
+  font-family: var(--font-sans, "Inter Variable"), "Noto Sans Arabic", "Segoe UI", Tahoma, "Geeza Pro", sans-serif;
+}
+
+html[dir="rtl"] :is(
+  pre, code, kbd, samp,
+  .xterm, .webtui-shell, .cm-editor, .monaco-editor,
+  diffs-container, [data-diffs], [data-diff-view], [data-code-view],
+  .katex-display
+) {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Inline code inside Arabic text stays in its place in the sentence. */
+html[dir="rtl"] :not(pre) > code {
+  unicode-bidi: isolate;
+}
+
+/* Reviewed document: each block takes the direction of its own text. */
+[data-doc-text-root] :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, dt, dd, figcaption) {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+/* Free text fields follow what is typed (dir="auto" is added at runtime). */
+textarea[dir="auto"], input[dir="auto"] {
+  text-align: start;
+}
+
+/* Directional icons (chevrons/arrows) point the reading way in RTL. */
+html[dir="rtl"] [data-rtl-flip] {
+  transform: scaleX(-1);
+}

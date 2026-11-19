@@ -21,6 +21,7 @@
     "./components/plan-diff/*": "./components/plan-diff/*.tsx",
     "./utils/*": "./utils/*.ts",
     "./lib/*": "./lib/*.ts",
+    "./i18n/*": "./i18n/*.ts",
     "./hooks/*": "./hooks/*.ts",
     "./shortcuts": "./shortcuts/index.ts",
     "./webmcp": "./webmcp/index.ts",

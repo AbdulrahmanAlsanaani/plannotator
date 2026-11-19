@@ -9,6 +9,7 @@ import '@plannotator/ui/utils/identity-tater';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { type Origin, getAgentName } from '@plannotator/shared/agents';
 import { ThemeProvider, useTheme } from '@plannotator/ui/components/ThemeProvider';
+import { LocaleThemeToggles } from '@plannotator/ui/components/LocaleThemeToggles';
 import { TooltipProvider } from '@plannotator/ui/components/Tooltip';
 import { ConfirmDialog } from '@plannotator/ui/components/ConfirmDialog';
 import { Settings } from '@plannotator/ui/components/Settings';
@@ -6237,6 +6238,9 @@ const ReviewApp: React.FC = () => {
             )}
 
             <div className="w-px h-5 bg-border/50 mx-1 hidden lg:block" />
+
+            {/* Language (AR/EN) and dark/light switches */}
+            <LocaleThemeToggles compact={isCompactTouchLayout} />
 
             <ReviewHeaderMenu
               onOpenSettings={() => setOpenSettingsMenu(true)}
