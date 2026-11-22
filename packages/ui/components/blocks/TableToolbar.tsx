@@ -25,7 +25,7 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
   onMouseLeave,
   onExpand,
 }) => {
-  const [position, setPosition] = useState<{ top: number; right: number } | null>(null);
+  const [position, setPosition] = useState<{ top: number; right?: number; left?: number } | null>(null);
   const [copiedMd, setCopiedMd] = useState(false);
   const [copiedCsv, setCopiedCsv] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -33,10 +33,13 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
   useEffect(() => {
     const updatePosition = () => {
       const rect = element.getBoundingClientRect();
-      setPosition({
-        top: rect.top - 40,
-        right: window.innerWidth - rect.right,
-      });
+      // Right-to-left tables (Arabic documents) start on the right, where the
+      // heading above them sits: put the toolbar on the table's left edge so
+      // it never covers the heading.
+      const rtl = window.getComputedStyle(element).direction === 'rtl';
+      setPosition(rtl
+        ? { top: rect.top - 40, left: rect.left }
+        : { top: rect.top - 40, right: window.innerWidth - rect.right });
     };
     updatePosition();
     window.addEventListener('scroll', updatePosition, true);
@@ -75,6 +78,7 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
   const style: React.CSSProperties = {
     top: position.top,
     right: position.right,
+    left: position.left,
     animation: isExiting
       ? 'table-toolbar-out 0.15s ease-in forwards'
       : 'table-toolbar-in 0.15s ease-out',

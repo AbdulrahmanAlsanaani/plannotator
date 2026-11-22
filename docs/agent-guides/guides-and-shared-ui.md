@@ -345,3 +345,9 @@ used to print as empty boxes — near-black text on a near-black node fill. The
 zoom strip stays `data-print-hide`; rings and badges still print.
 
 **Bundle note:** Pierre imports Shiki's full bundle, so every grammar and theme is already packed into the single-file builds (each its own chunk, fetched when first used); reusing its shared highlighter costs no extra bytes and needs no CDN or runtime wasm fetch. The Oniguruma WASM engine is dead weight under `shiki-js` and is aliased to `build/shiki-wasm-stub.ts` in the review, hook and portal Vite configs (via `resolve.alias`, which — unlike `plugins` — is shared with Vite's worker build).
+
+## Arabic interface and right-to-left documents
+
+- **Language switch.** The header's ع / EN button (`LocaleThemeToggles`, beside the sun/moon theme button) sets the interface language, kept in settings storage under `plannotator-locale` (`packages/ui/i18n/locale.ts`). Arabic puts `lang="ar" dir="rtl"` on `<html>`.
+- **Translation.** `packages/ui/i18n/domTranslator.ts`, started by `ThemeProvider`, swaps whole English strings in text nodes and `title` / `aria-label` / `placeholder` / `alt` for their entry in `packages/ui/i18n/ar.ts` (exact matches, patterns for strings with numbers, and context overrides such as "Open" on a question status tag). To translate a string, add it to `ar.ts`. Inside the document card only interface parts are translated (`data-print-hide`, `annotation-exclude`, `data-pinpoint-ignore`, `data-question-key`, `data-doc-chrome`); the document's own text, code and diffs never are.
+- **Document direction.** `Viewer` sets the article's `dir` from the document's own letters (`detectTextDirection`), so an Arabic plan reads right-to-left in either interface language; the badges and actions inside the card stay left-to-right. Blocks use logical sides (`ms-*`, `ps-*`, `border-s`, `marginInlineStart`) so they mirror; code, diffs and terminals are pinned left-to-right in `theme.css`.

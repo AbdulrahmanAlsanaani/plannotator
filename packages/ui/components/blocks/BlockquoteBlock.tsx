@@ -10,7 +10,7 @@ import { Callout } from './Callout';
 import { BlockRenderer } from '../BlockRenderer';
 
 /** The quote's look. Shared by both render paths so they cannot drift. */
-export const BLOCKQUOTE_CLASS_NAME = 'border-l-2 border-primary/50 pl-4 my-4 text-muted-foreground italic';
+export const BLOCKQUOTE_CLASS_NAME = 'border-s-2 border-primary/50 ps-4 my-4 text-muted-foreground italic';
 
 /**
  * Spacing and tone for a quote whose content has block structure. A

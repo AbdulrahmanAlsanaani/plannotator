@@ -14,16 +14,28 @@
  * observer sees it, records it as the new original and translates it again.
  * Switching back to English restores every original.
  *
- * Never translated: the document being reviewed (`[data-doc-text-root]`),
- * code, diffs, editors, terminals and anything under `[data-no-i18n]`.
+ * Never translated: the text of the document being reviewed, code, diffs,
+ * editors, terminals and anything under `[data-no-i18n]`. Inside the
+ * document card only the interface parts are translated: badges, actions,
+ * question cards and anything else the UI marks as not part of the text
+ * (`data-print-hide`, `annotation-exclude`, `data-pinpoint-ignore`,
+ * `data-doc-chrome`).
  */
-import { AR, AR_PATTERNS } from './ar';
+import { AR, AR_PATTERNS, AR_CONTEXT } from './ar';
 import { getLocale, subscribeLocale, applyDocumentLocale, refreshLocaleFromStorage, type Locale } from './locale';
 
 const ATTRS = ['title', 'aria-label', 'placeholder', 'alt'] as const;
 
+const DOC_ROOT = '[data-doc-text-root]';
+const DOC_CHROME = [
+  '[data-doc-chrome]',
+  '[data-print-hide]',
+  '.annotation-exclude',
+  '[data-pinpoint-ignore]',
+  '[data-question-key]',
+].join(',');
+
 const SKIP_SELECTOR = [
-  '[data-doc-text-root]',
   '[data-no-i18n]',
   'pre',
   'code',
@@ -48,12 +60,23 @@ const attrRecords = new WeakMap<Element, Map<string, TextRecord>>();
 let observer: MutationObserver | null = null;
 let started = false;
 
-function lookup(raw: string): string | null {
+function lookup(raw: string, el?: Element | null): string | null {
   const trimmed = raw.trim();
   if (!trimmed || trimmed.length > 160) return null;
   // Fast reject: nothing to translate in strings without Latin letters.
   if (!/[A-Za-z]/.test(trimmed)) return null;
-  let hit: string | undefined = AR[trimmed];
+  let hit: string | undefined;
+  // The same English word can need different Arabic by place ("Open" is a
+  // verb on a button, an adjective on a question's status tag).
+  if (el) {
+    for (const [selector, dict] of AR_CONTEXT) {
+      if (dict[trimmed] !== undefined && safeClosest(el, selector)) {
+        hit = dict[trimmed];
+        break;
+      }
+    }
+  }
+  if (hit === undefined) hit = AR[trimmed];
   if (hit === undefined) {
     // Labels often end in an ellipsis or colon that the dictionary omits.
     const m = /^(.*?)(\s*(?:\.\.\.|…|:))$/.exec(trimmed);
@@ -75,25 +98,34 @@ function lookup(raw: string): string | null {
   return lead + hit + trail;
 }
 
+function safeClosest(el: Element, selector: string): Element | null {
+  try {
+    return el.closest(selector);
+  } catch {
+    return null;
+  }
+}
+
 function isSkipped(el: Element | null): boolean {
   if (!el) return true;
-  try {
-    return el.closest(SKIP_SELECTOR) !== null;
-  } catch {
-    return false;
-  }
+  if (safeClosest(el, SKIP_SELECTOR)) return true;
+  const root = safeClosest(el, DOC_ROOT);
+  if (!root) return false;
+  // Inside the document card: only interface parts are translated.
+  const chrome = safeClosest(el, DOC_CHROME);
+  return !(chrome && root.contains(chrome));
 }
 
 function translateText(node: Text): void {
   const value = node.nodeValue ?? '';
   const rec = textRecords.get(node);
   if (rec && value === rec.tr) return; // our own write
-  const tr = lookup(value);
+  if (isSkipped(node.parentElement)) return;
+  const tr = lookup(value, node.parentElement);
   if (tr === null) {
     if (rec) textRecords.delete(node);
     return;
   }
-  if (isSkipped(node.parentElement)) return;
   textRecords.set(node, { orig: value, tr });
   node.nodeValue = tr;
 }
@@ -104,7 +136,8 @@ function translateAttr(el: Element, name: string): void {
   let map = attrRecords.get(el);
   const rec = map?.get(name);
   if (rec && value === rec.tr) return;
-  const tr = lookup(value);
+  if (isSkipped(el)) return;
+  const tr = lookup(value, el);
   if (tr === null) {
     map?.delete(name);
     return;
@@ -137,7 +170,7 @@ function walk(root: Node, translate: boolean): void {
   const start = root as Element;
   if (start.nodeType === Node.ELEMENT_NODE) {
     autoDirField(start);
-    if (translate && isSkipped(start)) return;
+    if (translate && safeClosest(start, SKIP_SELECTOR)) return;
   }
   const doc = root.ownerDocument ?? document;
   const tw = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
@@ -191,7 +224,7 @@ function onMutations(records: MutationRecord[]): void {
     if (r.type === 'characterData') {
       if (translate) translateText(r.target as Text);
     } else if (r.type === 'attributes') {
-      if (translate && r.attributeName && !isSkipped(r.target as Element)) {
+      if (translate && r.attributeName) {
         translateAttr(r.target as Element, r.attributeName);
       }
     } else {

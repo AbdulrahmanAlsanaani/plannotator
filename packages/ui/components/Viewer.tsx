@@ -1,4 +1,5 @@
 import { generateId } from '../utils/generateId';
+import { detectTextDirection } from '../i18n/direction';
 import React, { useRef, useState, useEffect, useLayoutEffect, useMemo, forwardRef, useImperativeHandle, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { collectDocumentImages, ImageLightbox, type LightboxImage, type LightboxRegionComments } from './ImageLightbox';
@@ -962,6 +963,8 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({
   // anchor ids stay stable across re-renders and duplicate heading texts get
   // `-1`/`-2`/... suffixes rather than colliding on the same id.
   const headingSlugMap = useMemo(() => buildHeadingSlugMap(blocks), [blocks]);
+  // Arabic / English: the document's own reading direction.
+  const docDir = useMemo(() => detectTextDirection(blocks), [blocks]);
   // `:::question` blocks: numbered in document order, answers drawn from the
   // annotations that carry `questionAnswer` (matched by question key, so an
   // answer follows its question across re-parses).
@@ -1736,7 +1739,9 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({
         ref={containerRef}
         data-print-region="article"
         data-doc-text-root=""
-        dir="auto"
+        // The document reads in its own direction: an Arabic plan is
+        // right-to-left even in the English interface.
+        dir={docDir}
         data-vim-mode={vimModeActive ? 'enabled' : undefined}
         data-vim-phase={vimModeActive ? vim.state.phase : undefined}
         data-vim-focused={vimModeActive ? String(vim.focused) : undefined}
@@ -1752,6 +1757,9 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({
           ...(vimModeActive ? { outline: 'none' } : {}),
         } as React.CSSProperties}
       >
+        {/* Badges and actions keep their left-to-right placement (they are
+            positioned with left/right offsets) whatever the document reads. */}
+        <div dir="ltr" data-doc-chrome="" style={{ display: 'contents' }}>
         {!viewerAnnotationHeader && (repoInfo || hasPreviousVersion || showDemoBadge || linkedDocInfo || archiveInfo || sourceInfo || openInAppPath) && (
           <div
             ref={docBadgesRef}
@@ -1817,6 +1825,7 @@ export const Viewer = forwardRef<ViewerHandle, ViewerProps>(({
             )}
           </>
         )}
+        </div>
         {frontmatter && <><div className="clear-right md:hidden" /><FrontmatterCard frontmatter={frontmatter} /></>}
         {!frontmatter && blocks.length > 0 && blocks[0].type !== 'heading' && <div className="mt-4" />}
         {withBelowTitle(groupBlocks(blocks).map(group =>

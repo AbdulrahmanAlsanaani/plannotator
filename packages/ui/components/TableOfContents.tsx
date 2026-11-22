@@ -55,7 +55,7 @@ function flattenToc(items: TocItem[]): TocItem[] {
 // H1 flush + near-full strength, H2/H3 indented and dimmed to muted. Active row
 // is a soft neutral surface tint (not a loud primary fill).
 function itemClasses(level: number, isActive: boolean): string {
-  const indent = level <= 1 ? '' : level === 2 ? 'ml-3' : level === 3 ? 'ml-6' : 'ml-9';
+  const indent = level <= 1 ? '' : level === 2 ? 'ms-3' : level === 3 ? 'ms-6' : 'ms-9';
   const tone = isActive
     ? 'bg-surface-1 text-foreground'
     : level <= 1
@@ -167,7 +167,7 @@ export function TableOfContents({
               >
                 <span className="line-clamp-2">{item.content}</span>
                 {item.annotationCount > 0 && (
-                  <span className="ml-1 flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 px-1 font-mono text-[9px] text-primary">
+                  <span className="ms-1 flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-primary/10 px-1 font-mono text-[9px] text-primary">
                     {item.annotationCount}
                   </span>
                 )}

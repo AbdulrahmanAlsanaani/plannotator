@@ -61,7 +61,7 @@ describe('AlertBlock title line', () => {
     expect(srOnly(el)).toBe('Important: ');
     expect(titleRow(el).querySelector('svg')).not.toBeNull(); // type icon stays
     expect(paragraphs(el)).toEqual(['The env still names D1.']); // no bold paragraph any more
-    expect(el.querySelector('.alert-body')?.className).toContain('pl-6');
+    expect(el.querySelector('.alert-body')?.className).toContain('ps-6');
   });
 
   test.skipIf(!hasDom)('C: an emoji takes the icon slot and the type SVG is gone', async () => {

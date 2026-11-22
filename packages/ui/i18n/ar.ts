@@ -547,10 +547,61 @@ export const AR: Record<string, string> = {
   'Open Demo': 'فتح العرض التجريبي',
   'Demo': 'تجريبي',
   'Yes, turn it on': 'نعم، فعّله',
+
+  // ── Seen in plan review (questions, document card, width toggles) ──
+  'Images': 'الصور',
+  'Image': 'صورة',
+  'Focus': 'تركيز',
+  'Wide': 'عريض',
+  'how does this work?': 'كيف يعمل هذا؟',
+  'How does this work?': 'كيف يعمل هذا؟',
+  'Hide panels and expand document width': 'إخفاء اللوحات وتوسيع عرض المستند',
+  'Click to close · Drag to resize': 'انقر للإغلاق · اسحب لتغيير الحجم',
+  'since last review': 'منذ آخر مراجعة',
+  'Not answered yet': 'لم تتم الإجابة بعد',
+  'Select text in the document to comment. Question and option text is selectable too.': 'حدد نصاً في المستند للتعليق عليه. يمكنك تحديد نص الأسئلة والخيارات أيضاً.',
+  'Select text in the document to add comments or suggest changes.': 'حدد نصاً في المستند لإضافة تعليقات أو اقتراح تغييرات.',
+  'answered': 'مُجاب',
+  'Skipped': 'تم التخطي',
+  'Other': 'أخرى',
+  'Type your answer': 'اكتب إجابتك',
+  'Shows': 'يعرض',
+  "Can’t be undone": 'لا يمكن التراجع عنه',
+  "Can't be undone": 'لا يمكن التراجع عنه',
+  'Go to the next open question': 'الانتقال إلى السؤال المفتوح التالي',
+  'Question': 'سؤال',
+  'Tip': 'نصيحة',
+  'Important': 'مهم',
+  'Warning': 'تحذير',
+  'Caution': 'تنبيه',
+  'Info': 'معلومة',
+  'Danger': 'خطر',
+  'Success': 'نجاح',
+  'Copy markdown': 'نسخ Markdown',
+  'Copy as CSV': 'نسخ كـ CSV',
+  'Expand table': 'توسيع الجدول',
+  'Zoom in': 'تكبير',
+  'Zoom out': 'تصغير',
+  'Reset zoom': 'إعادة ضبط التكبير',
+  'Fullscreen': 'ملء الشاشة',
+  'Exit fullscreen': 'الخروج من ملء الشاشة',
+  'Open in app': 'فتح في التطبيق',
+  'Edit document': 'تعديل المستند',
+  'Edit markdown': 'تعديل Markdown',
+  'Clear': 'مسح',
+  'Remove answer': 'إزالة الإجابة',
 };
 
 /** Strings with a variable part. */
 export const AR_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
+  [/^Question (\d+) of (\d+) · pick any$/i, (m) => `سؤال ${m[1]} من ${m[2]} · اختر ما يناسب`],
+  [/^Question (\d+) of (\d+)$/i, (m) => `سؤال ${m[1]} من ${m[2]}`],
+  [/^Question · pick any$/i, () => 'سؤال · اختر ما يناسب'],
+  [/^Hide panels, keep document width \((.+)\)$/, (m) => `إخفاء اللوحات مع إبقاء عرض المستند ⁦(${m[1]})⁩`],
+  [/^(\d+) of (\d+) questions? answered\.( Go to next unanswered\.)?$/, (m) => `تمت الإجابة على ${m[1]} من ${m[2]}.${m[3] ? ' انتقل إلى التالي.' : ''}`],
+  [/^(.+) \(settled\)$/, (m) => `${m[1]} (محسوم)`],
+  [/^· has note$/, () => '· فيه ملاحظة'],
+  [/^Can['’]t be undone: (.+)$/, (m) => `لا يمكن التراجع عنه: ${m[1]}`],
   [/^(\d+) annotations?$/, (m) => `${m[1]} تعليق`],
   [/^(\d+) comments?$/, (m) => `${m[1]} تعليق`],
   [/^(\d+) files?$/, (m) => `${m[1]} ملف`],
@@ -559,4 +610,18 @@ export const AR_PATTERNS: Array<[RegExp, (m: RegExpExecArray) => string]> = [
   [/^(\d+) of (\d+)$/, (m) => `${m[1]} من ${m[2]}`],
   [/^Back to (.+)$/, (m) => `العودة إلى ${m[1]}`],
   [/^Open (.+) in (.+)$/, (m) => `فتح ${m[1]} في ${m[2]}`],
+];
+
+/**
+ * Context overrides: where an element sits decides the word. The first
+ * selector the element is inside (and that has an entry) wins.
+ */
+export const AR_CONTEXT: Array<[string, Record<string, string>]> = [
+  // Question status tags and the questions panel: states, not verbs.
+  ['[data-question-tag], [data-question-row], [data-questions-panel]', {
+    'Open': 'مفتوح',
+    'Answered': 'مُجاب',
+    'Settled': 'محسوم',
+    'Skipped': 'متخطّى',
+  }],
 ];

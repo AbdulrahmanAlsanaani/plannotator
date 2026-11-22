@@ -79,7 +79,7 @@ export const AlertBlock: React.FC<AlertBlockProps> = ({
 
   return (
     <div
-      className={`alert alert-${kind} my-4 pl-4 pr-3 py-2 border-l-[3px]`}
+      className={`alert alert-${kind} my-4 ps-4 pe-3 py-2 border-s-[3px]`}
       data-block-id={blockId}
       data-block-type="alert"
       data-alert-kind={kind}
@@ -102,14 +102,14 @@ export const AlertBlock: React.FC<AlertBlockProps> = ({
                 <InlineMarkdown text={titleLine.title} {...proseProps} />
               </>
             )
-            : TITLE[kind]}
+            : <span data-doc-chrome="">{TITLE[kind]}</span>}
         </span>
       </div>
       {titleLine
         ? (titleLine.rest.trim()
             // Indent the body by the icon's width plus the row gap so it starts
             // at the title's left edge (16px icon + 8px gap = pl-6).
-            ? <div className="alert-body pl-6">{renderProseBody({ body: titleLine.rest, ...proseProps })}</div>
+            ? <div className="alert-body ps-6">{renderProseBody({ body: titleLine.rest, ...proseProps })}</div>
             : null)
         : renderProseBody({ body, ...proseProps })}
     </div>

@@ -1588,27 +1588,27 @@ body:has([data-popout="true"]) [data-sidebar-tabs="true"] {
 }
 
 /* GitHub-style alerts: > [!NOTE] / [!TIP] / [!WARNING] / [!CAUTION] / [!IMPORTANT] */
-.alert-note      { border-left-color: #0969da; }
+.alert-note      { border-inline-start-color: #0969da; }
 .alert-note      .alert-title { color: #0969da; }
-.alert-tip       { border-left-color: #1a7f37; }
+.alert-tip       { border-inline-start-color: #1a7f37; }
 .alert-tip       .alert-title { color: #1a7f37; }
-.alert-warning   { border-left-color: #9a6700; }
+.alert-warning   { border-inline-start-color: #9a6700; }
 .alert-warning   .alert-title { color: #9a6700; }
-.alert-caution   { border-left-color: #cf222e; }
+.alert-caution   { border-inline-start-color: #cf222e; }
 .alert-caution   .alert-title { color: #cf222e; }
-.alert-important { border-left-color: #8250df; }
+.alert-important { border-inline-start-color: #8250df; }
 .alert-important .alert-title { color: #8250df; }
 
 @media (prefers-color-scheme: dark) {
-  .alert-note      { border-left-color: #4493f8; }
+  .alert-note      { border-inline-start-color: #4493f8; }
   .alert-note      .alert-title { color: #4493f8; }
-  .alert-tip       { border-left-color: #3fb950; }
+  .alert-tip       { border-inline-start-color: #3fb950; }
   .alert-tip       .alert-title { color: #3fb950; }
-  .alert-warning   { border-left-color: #d29922; }
+  .alert-warning   { border-inline-start-color: #d29922; }
   .alert-warning   .alert-title { color: #d29922; }
-  .alert-caution   { border-left-color: #f85149; }
+  .alert-caution   { border-inline-start-color: #f85149; }
   .alert-caution   .alert-title { color: #f85149; }
-  .alert-important { border-left-color: #ab7df8; }
+  .alert-important { border-inline-start-color: #ab7df8; }
   .alert-important .alert-title { color: #ab7df8; }
 }
 
@@ -1924,7 +1924,9 @@ html[lang="ar"] body {
   font-family: var(--font-sans, "Inter Variable"), "Noto Sans Arabic", "Segoe UI", Tahoma, "Geeza Pro", sans-serif;
 }
 
-html[dir="rtl"] :is(
+/* Code, diffs and terminals read left-to-right wherever they sit: in the
+   Arabic interface and inside an Arabic document in either interface. */
+[dir="rtl"] :is(
   pre, code, kbd, samp,
   .xterm, .webtui-shell, .cm-editor, .monaco-editor,
   diffs-container, [data-diffs], [data-diff-view], [data-code-view],
@@ -1935,12 +1937,23 @@ html[dir="rtl"] :is(
 }
 
 /* Inline code inside Arabic text stays in its place in the sentence. */
-html[dir="rtl"] :not(pre) > code {
+[dir="rtl"] :not(pre) > code {
   unicode-bidi: isolate;
 }
 
+/* Short pieces of interface text (labels, buttons, list rows, a question
+   in the panel) each take the direction of their own words, so English
+   left untranslated keeps its punctuation in the Arabic interface and an
+   Arabic question reads in order in the English one. */
+:where(span, a, button, label, b, strong, em, small) {
+  unicode-bidi: plaintext;
+}
+:where(pre, code, .xterm, svg) :where(span, a, button, label, b, strong, em, small) {
+  unicode-bidi: normal;
+}
+
 /* Reviewed document: each block takes the direction of its own text. */
-[data-doc-text-root] :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, dt, dd, figcaption) {
+[data-doc-text-root] :is(p, h1, h2, h3, h4, h5, h6, td, th, dt, dd, figcaption) {
   unicode-bidi: plaintext;
   text-align: start;
 }
@@ -1949,6 +1962,10 @@ html[dir="rtl"] :not(pre) > code {
 textarea[dir="auto"], input[dir="auto"] {
   text-align: start;
 }
+
+/* Interface layout written as left/right mirrors in the Arabic interface. */
+html[dir="rtl"] .text-left:not([data-doc-text-root] *) { text-align: right; }
+html[dir="rtl"] .text-right:not([data-doc-text-root] *) { text-align: left; }
 
 /* Directional icons (chevrons/arrows) point the reading way in RTL. */
 html[dir="rtl"] [data-rtl-flip] {

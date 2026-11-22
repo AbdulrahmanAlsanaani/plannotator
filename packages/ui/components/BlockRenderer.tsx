@@ -147,7 +147,7 @@ export const BlockRenderer: React.FC<{
           data-rich-list-kind={block.ordered ? 'ol' : 'ul'}
           data-rich-list-index={orderedIndex ?? undefined}
           data-rich-list-checked={isCheckbox ? String(isChecked) : undefined}
-          style={{ marginLeft: `${indent}rem` }}
+          style={{ marginInlineStart: `${indent}rem` }}
         >
           <ListItemBody
             level={block.level || 0}
